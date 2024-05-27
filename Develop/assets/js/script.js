@@ -17,7 +17,10 @@ function createTaskCard(task) {
     const newTitle = $("<h3>").text(task.taskTitle)
     const newTaskDescription = $("<p>").text(task.taskDescription)
     const newDueDate = $("<p>").text(task.taskDueDate)
-    const newDeleteButton = $("<button>").text("Delete")
+    const newDeleteButton = $('<button>')
+        .text('Delete')
+        .attr('data-task-id', task.id);
+    // const newDeleteButton = $("<button>").text("Delete")
     newDeleteButton.on("click", handleDeleteTask)
     const dayOfTaskDue = dayjs(task.taskDueDate)
     const currentDate = dayjs()
@@ -84,8 +87,10 @@ function handleAddTask(event) {
 }
 // Todo: create a function to handle deleting a task
 function handleDeleteTask(event) {
-    const taskId = $(event.target).closest(".task-card").data("id");
-    taskList = taskList.filter(task => task.id !== taskId);
+    event.preventDefault()
+    const taskId = $(this).attr('data-task-id');
+    console.log("task id is ", taskId)
+    taskList = taskList.filter((task) => task.id !== parseInt(taskId));
     localStorage.setItem("tasks", JSON.stringify(taskList));
     renderTaskList();
 

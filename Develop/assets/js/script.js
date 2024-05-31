@@ -14,6 +14,7 @@ function createTaskCard(task) {
     //  Take task details (id, title, description, due date) as input.
     const newTaskCard = $("<div>")
     newTaskCard.attr('id', task.id)
+    newTaskCard.addClass("draggable")
     const newTitle = $("<h3>").text(task.taskTitle)
     const newTaskDescription = $("<p>").text(task.taskDescription)
     const newDueDate = $("<p>").text(task.taskDueDate)
@@ -55,17 +56,20 @@ function renderTaskList() {
             console.log(taskCard)
             todoCards.append(taskCard)
         }
-        if (task.status === "in-progress-cards") {
+        if (task.status === "in-progress") {
             const taskCard = createTaskCard(task)
             console.log(taskCard)
-            todoCards.append(taskCard)
+            inProgressCards.append(taskCard)
         }
-        if (task.status === "done-cards") {
+        if (task.status === "done") {
             const taskCard = createTaskCard(task)
             console.log(taskCard)
-            todoCards.append(taskCard)
+            doneCards.append(taskCard)
         }
     }
+    $(".draggable").draggable({
+        snap: ".droppable", snapMode: "inner"
+    })
     // invoke createTaskCard to add it to the corresponding elements
 }
 // Todo: create a function to handle adding a new task
@@ -98,11 +102,26 @@ function handleDeleteTask(event) {
 
 // Todo: create a function to handle dropping a task into a new status lane
 function handleDrop(event, ui) {
-
+    console.log(event)
+    console.log(ui)
+    const status = event.target.id
+    const draggedTaskId = ui.draggable[0].id
+    // const found = taskList.find((task) => task.id === Number(draggedTaskId));
+    for (const task of taskList) {
+        if (task.id === Number(draggedTaskId)) {
+            task.status = status
+        }
+    }
+    localStorage.setItem("tasks", JSON.stringify(taskList));
+    renderTaskList()
 }
 
 // Todo: when the page loads, render the task list, add event listeners, make lanes droppable, and make the due date field a date picker
 $(document).ready(function () {
+    $(".droppable").droppable({
+        drop: handleDrop,
+        accept: ".draggable"
+    })
     $('#addtask').on("click", handleAddTask)
 
 
